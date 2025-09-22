@@ -13,12 +13,22 @@ interface TMDBResult {
   media_type?: 'movie' | 'tv';
 }
 
-const apiConfig = {
+// --- CORREÇÃO AQUI ---
+// Definimos um tipo para a configuração, informando que 'params' é opcional
+type ApiConfigItem = {
+  path: string;
+  searchPath: string;
+  type: 'movie' | 'tv';
+  params?: string; // O '?' torna a propriedade opcional
+};
+
+const apiConfig: Record<string, ApiConfigItem> = {
   movie: { path: '/discover/movie', searchPath: '/search/movie', type: 'movie' },
   series: { path: '/discover/tv', searchPath: '/search/tv', type: 'tv' },
   anime: { path: '/discover/tv', searchPath: '/search/tv', type: 'tv', params: '&with_keywords=210024' },
   dorama: { path: '/discover/tv', searchPath: '/search/tv', type: 'tv', params: '&with_keywords=18035' },
 };
+// --------------------
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -30,17 +40,15 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Chave da API do TMDb não configurada.' }, { status: 500 });
   }
 
-  const config = apiConfig[type as keyof typeof apiConfig];
+  const config = apiConfig[type]; // Não precisa mais de 'as keyof typeof apiConfig'
   if (!config) {
     return NextResponse.json({ error: 'Tipo de conteúdo inválido' }, { status: 400 });
   }
 
   let url = '';
   if (query) {
-    // Se tem uma busca, usa o endpoint de pesquisa
     url = `${TMDB_BASE_URL}${config.searchPath}?api_key=${TMDB_API_KEY}&language=pt-BR&query=${encodeURIComponent(query)}&page=${page}`;
   } else {
-    // Senão, usa o endpoint de descoberta (populares)
     url = `${TMDB_BASE_URL}${config.path}?api_key=${TMDB_API_KEY}&language=pt-BR&page=${page}${config.params || ''}`;
   }
 
@@ -51,7 +59,7 @@ export async function GET(request: NextRequest) {
     const data = await tmdbResponse.json();
 
     const contentList = data.results
-      .filter((item: TMDBResult) => item.poster_path) // Filtra itens sem poster
+      .filter((item: TMDBResult) => item.poster_path)
       .map((item: TMDBResult) => ({
         id: item.id.toString(),
         title: item.title || item.name || 'Título Desconhecido',
