@@ -91,7 +91,7 @@ function SeriesModal({ content, onClose }: { content: ContentItem; onClose: () =
             )}
           </>
         )}
-        <div className="modal-actions"><button onClick={onClose} className="generate-button">Fechar</button></div>
+        <div className="modal-actions"><button onClick={onClose}>Fechar</button></div>
       </div>
     </div>
   );
@@ -120,7 +120,10 @@ function HomePage() {
 
     try {
       const response = await fetch(url);
-      if (!response.ok) throw new Error((await response.json()).error || 'Erro ao carregar.');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erro ao carregar.');
+      }
       setContent(await response.json());
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ocorreu um erro.');
@@ -146,6 +149,7 @@ function HomePage() {
       {isModalOpen && selectedContent && <SeriesModal content={selectedContent} onClose={() => setIsModalOpen(false)} />}
       <header className="app-header">
         <div className="title-container">
+            {/* --- LOGO ADICIONADA AQUI --- */}
             <Image src="https://i.ibb.co/TBJL3XfW/Baixe-Down-Mp4-Ico.png" alt="BaixeDownMp4 Logo" width={50} height={50} />
             <h1>BaixeDownMp4</h1>
         </div>
@@ -165,14 +169,13 @@ function HomePage() {
         {error && <p className="error-message">{error}</p>}
         {!isLoading && !error && content.map(item => (
           <div key={`${item.type}-${item.id}`} className="content-card">
-            {/* *** CORREÇÃO AQUI: Troca de <img> por <Image> *** */}
             <Image 
                 src={item.posterUrl} 
                 alt={item.title} 
                 width={500} 
                 height={750} 
                 className="poster" 
-                style={{ height: 'auto' }} // Mantém a proporção da imagem
+                style={{ height: 'auto' }}
             />
             <div className="card-body">
               <h3 className="content-title">{item.title}</h3>
