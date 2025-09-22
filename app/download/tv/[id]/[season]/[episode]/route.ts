@@ -1,4 +1,3 @@
-// app/download/tv/[id]/[season]/[episode]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
