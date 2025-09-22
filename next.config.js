@@ -1,3 +1,4 @@
+// Forçando novo deploy
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Adiciona a configuração de imagens
