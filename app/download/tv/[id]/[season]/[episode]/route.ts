@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Simplificando a tipagem do segundo argumento
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string; season: string; episode: string } }
+    context: { params: { id: string; season: string; episode: string } }
 ) {
-    const { id, season, episode } = params;
+    const { id, season, episode } = context.params;
     const { searchParams } = new URL(request.url);
     const title = searchParams.get('title') || `serie_${id}_S${season}E${episode}`;
     const videoUrl = `https://roxanoplay.bb-bet.top/pages/proxys.php?id=${id}/${season}/${episode}`;

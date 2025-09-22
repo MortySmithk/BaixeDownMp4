@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Simplificando a tipagem do segundo argumento
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    context: { params: { id: string } }
 ) {
-    const { id } = params;
+    const { id } = context.params;
     const { searchParams } = new URL(request.url);
     const title = searchParams.get('title') || `filme_${id}`;
     const videoUrl = `https://roxanoplay.bb-bet.top/pages/hostmov.php?id=${id}`;
